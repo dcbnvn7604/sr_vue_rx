@@ -13,6 +13,7 @@
   },
   "dependencies": {},
   "devDependencies": {
+    "@testing-library/vue": "^5.8.2",
     "vue": "^2.6.14"
   }
 }
