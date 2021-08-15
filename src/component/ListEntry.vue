@@ -1,5 +1,5 @@
 <template>
-  <div data-testid="list-entry">List Entry</div>
+  <div data-testid="listentry">List Entry</div>
 </template>
 
 <script>

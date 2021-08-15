@@ -1,5 +1,5 @@
 import { from, of, merge } from 'rxjs';
-import { filter, map, switchMap, tap, shareReplay } from 'rxjs/operators';
+import { filter, map, concatMap, tap, shareReplay } from 'rxjs/operators';
 
 export class UnauthenticatedException {};
 export class UnsupportException {};
@@ -32,12 +32,12 @@ class API {
     );
     const fetchListEntry = token.pipe(
       filter(x => !!x),
-      switchMap(x => from(fetch(`${this.host}/api/entry/`, {
+      concatMap(x => from(fetch(`${this.host}/api/entry/`, {
         headers: {
           'Content-Type': 'application/json'
         }
       }))),
-      switchMap(response => {
+      concatMap(response => {
         switch (response.status) {
           case 200:
             return from(response.json());
@@ -48,6 +48,27 @@ class API {
     );
     return merge(noToken, fetchListEntry).pipe(
       shareReplay(1)
+    );
+  }
+
+  login(username, password) {
+    return from(fetch(`${this.host}/api/auth/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({username, password})
+    })).pipe(
+      concatMap(response => {
+        switch (response.status) {
+          case 200: 
+            return from(response.json())
+          default:
+            throw new UnsupportException();
+        }
+      }),
+      map(response => response['token']),
+      tap(token => this.setToken(token))
     );
   }
 }
