@@ -1,5 +1,5 @@
 <template>
-  <div>Login</div>
+  <div data-testid="login">Login</div>
 </template>
 
 <script>
