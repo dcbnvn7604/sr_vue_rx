@@ -1,5 +1,7 @@
 <template>
-  <div data-testid="listentry">List Entry</div>
+  <div data-testid="listentry">
+    <router-link v-if="entries" v-for="entry in entries" :to="`/entry/${entry.id}`" :data-testid="`linkDetailEntry${entry.id}`">{{entry.title}}</router-link>
+  </div>
 </template>
 
 <script>
@@ -10,7 +12,9 @@
 
   export default {
     data: function() {
-      return {}
+      return {
+        entries: null
+      }
     },
 
     mounted() {
@@ -22,9 +26,9 @@
       });
       fetchListEntry.pipe(
         filter(x => !(x instanceof UnauthenticatedException))
-      ).subscribe(x => {
-        
-      })
+      ).subscribe(entries => {
+        this.entries = entries
+      });
     }
   }
 </script>
