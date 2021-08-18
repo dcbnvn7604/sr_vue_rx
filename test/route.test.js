@@ -105,6 +105,7 @@ describe('router', () => {
     global.fetch = mockFetch;
 
     const { getByTestId, findByTestId } = render(App, {routes}, (vue, store, router) => {
+      // Workaround of bug of render
       router.push('/');
     });
     await findByTestId('listentry');
@@ -122,6 +123,7 @@ describe('router', () => {
     global.fetch = mockFetch;
 
     const { getByTestId, findByTestId } = render(App, {routes}, (vue, store, router) => {
+      // Workaround of bug of render
       router.push('/');
     });
 
@@ -129,6 +131,33 @@ describe('router', () => {
     await fireEvent.click(getByTestId('addButton'));
     await findByTestId('addentry');
     await fireEvent.click(getByTestId('cancelButton'));
+    await findByTestId('listentry');
+  });
+
+  it('click save in page `add entry`', async () => {
+    api.setToken('token1');
+    let mockFetch = jest.fn();
+    mockFetch.mockResolvedValueOnce({
+      status: 200,
+      json: () => Promise.resolve([{id: 1, title: 'title 1'}]),
+    });
+    mockFetch.mockResolvedValueOnce({
+      status: 201,
+      json: () => Promise.resolve({}),
+    });
+    global.fetch = mockFetch;
+
+    const { getByTestId, findByTestId } = render(App, {routes}, (vue, store, router) => {
+      // Workaround of bug of render
+      router.push('/');
+    });
+
+    await findByTestId('listentry');
+    await fireEvent.click(getByTestId('addButton'));
+    await findByTestId('addentry');
+    await fireEvent.update(getByTestId('titleInput', 'title 2'));
+    await fireEvent.update(getByTestId('contentInput', 'content 2'));
+    await fireEvent.click(getByTestId('saveButton'));
     await findByTestId('listentry');
   });
 });

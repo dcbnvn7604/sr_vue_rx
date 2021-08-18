@@ -1,5 +1,5 @@
-import { from, of, merge } from 'rxjs';
-import { filter, map, concatMap, tap, shareReplay } from 'rxjs/operators';
+import { from, of, merge, partition } from 'rxjs';
+import { filter, map, concatMap, tap, mapTo } from 'rxjs/operators';
 
 export class UnauthenticatedException {};
 export class UnsupportException {};
@@ -101,6 +101,28 @@ class API {
     return merge(noToken, fetchEditEntry);
   }
 
+  addEntry(entry) {
+    return this._checkToken(hasToken => {
+      return hasToken.pipe(
+        concatMap(x => from(fetch(`${this.host}/api/entry`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({title: entry.title, password: entry.content})
+        }))),
+        map(response => {
+          switch (response.status) {
+            case 201:
+              return;
+            default:
+              throw new UnsupportException();
+          }
+        })
+      );
+    });
+  }
+
   login(username, password) {
     return from(fetch(`${this.host}/api/auth/`, {
       method: 'POST',
@@ -120,6 +142,14 @@ class API {
       map(response => response['token']),
       tap(token => this.setToken(token))
     );
+  }
+
+  _checkToken(doIfToken) {
+    const [ noToken, hasToken ] = partition(of(this.token), x => !x);
+    const exception = noToken.pipe(
+      mapTo(new UnauthenticatedException())
+    );
+    return merge(doIfToken(hasToken), exception)
   }
 }
 
