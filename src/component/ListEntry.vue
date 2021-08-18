@@ -9,8 +9,11 @@
 
   import api from '../api.js';
   import { UnauthenticatedException } from '../api.js';
+  import apiMixin from './apiMixin.js';
 
   export default {
+    mixins: [ apiMixin ],
+
     data: function() {
       return {
         entries: null
@@ -18,17 +21,10 @@
     },
 
     mounted() {
-      const fetchListEntry = api.listEntry();
-      fetchListEntry.pipe(
-        filter(x => x instanceof UnauthenticatedException)
-      ).subscribe(x => {
-        this.$router.push({ path: '/login' })
-      });
-      fetchListEntry.pipe(
-        filter(x => !(x instanceof UnauthenticatedException))
-      ).subscribe(entries => {
-        this.entries = entries
-      });
+      this.apiException(api.listEntry())
+        .subscribe(entries => {
+          this.entries = entries
+        });
     }
   }
 </script>

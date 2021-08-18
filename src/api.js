@@ -73,9 +73,7 @@ class API {
         }
       })
     );
-    return merge(noToken, fetchDetailEntry).pipe(
-      shareReplay(1)
-    );
+    return merge(noToken, fetchDetailEntry);
   }
 
   editEntry(entry) {

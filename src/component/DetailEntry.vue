@@ -33,17 +33,11 @@
     },
 
     mounted() {
-      const fetchDetailEntry = api.detailEntry();
-      fetchDetailEntry.pipe(
-        filter(x => x instanceof UnauthenticatedException)
-      ).subscribe(x => {
-        this.$router.push({ path: '/login' });
-      });
-      fetchDetailEntry.pipe(
-        filter(x => !(x instanceof UnauthenticatedException))
-      ).subscribe(entry => {
-        this.entry = entry;
-      });
+      this.apiException(api.detailEntry())
+        .subscribe(entry => {
+          this.entry = entry;
+        });
+
       this.clickEdit.subscribe(() => {
         this.editting = true;
       });
