@@ -46,9 +46,7 @@ class API {
         }
       })
     );
-    return merge(noToken, fetchListEntry).pipe(
-      shareReplay(1)
-    );
+    return merge(noToken, fetchListEntry);
   }
 
   detailEntry(id) {
