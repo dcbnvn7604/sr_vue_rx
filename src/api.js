@@ -25,80 +25,65 @@ class API {
   }
 
   listEntry() {
-    const token = of(this.token);
-    const noToken = token.pipe(
-      filter(x => !x),
-      map(x => new UnauthenticatedException())
-    );
-    const fetchListEntry = token.pipe(
-      filter(x => !!x),
-      concatMap(x => from(fetch(`${this.host}/api/entry/`, {
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      }))),
-      concatMap(response => {
-        switch (response.status) {
-          case 200:
-            return from(response.json());
-          default:
-            throw new UnsupportException();
-        }
-      })
-    );
-    return merge(noToken, fetchListEntry);
+    return this._checkToken(hasToken => {
+      return hasToken.pipe(
+        concatMap(x => from(fetch(`${this.host}/api/entry/`, {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }))),
+        concatMap(response => {
+          switch (response.status) {
+            case 200:
+              return from(response.json());
+            default:
+              throw new UnsupportException();
+          }
+        })
+      );
+    });
   }
 
   detailEntry(id) {
-    const token = of(this.token);
-    const noToken = token.pipe(
-      filter(x => !x),
-      map(x => new UnauthenticatedException())
-    );
-    const fetchDetailEntry = token.pipe(
-      filter(x => !!x),
-      concatMap(x => from(fetch(`${this.host}/api/entry/${id}`, {
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      }))),
-      concatMap(response => {
-        switch (response.status) {
-          case 200:
-            return from(response.json());
-          default:
-            throw new UnsupportException();
-        }
-      })
-    );
-    return merge(noToken, fetchDetailEntry);
+    return this._checkToken(hasToken => {
+      return hasToken.pipe(
+        concatMap(x => from(fetch(`${this.host}/api/entry/${id}`, {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }))),
+        concatMap(response => {
+          switch (response.status) {
+            case 200:
+              return from(response.json());
+            default:
+              throw new UnsupportException();
+          }
+        })
+      );
+    });
   }
 
   editEntry(entry) {
-    const token = of(this.token);
-    const noToken = token.pipe(
-      filter(x => !x),
-      map(x => new UnauthenticatedException())
-    );
-    const fetchEditEntry = token.pipe(
-      filter(x => !!x),
-      concatMap(x => from(fetch(`${this.host}/api/entry/${entry.id}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({title: entry.title, password: entry.content})
-      }))),
-      map(response => {
-        switch (response.status) {
-          case 200:
-            return;
-          default:
-            throw new UnsupportException();
-        }
-      })
-    );
-    return merge(noToken, fetchEditEntry);
+    return this._checkToken(hasToken => {
+      return hasToken.pipe(
+        concatMap(x => from(fetch(`${this.host}/api/entry/${entry.id}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({title: entry.title, password: entry.content})
+        }))),
+        map(response => {
+          switch (response.status) {
+            case 200:
+              return;
+            default:
+              throw new UnsupportException();
+          }
+        })
+      );
+    });
   }
 
   addEntry(entry) {
