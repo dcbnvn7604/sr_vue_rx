@@ -10,6 +10,8 @@
 </template>
 
 <script>
+  import { map } from 'rxjs/operators';
+
   export default {
     domStreams: ['clickSave', 'clickCancel'],
 
@@ -25,6 +27,10 @@
     mounted() {
       this.clickCancel.subscribe(() => {
         this.$emit('cancelentry');
+      });
+
+      this.clickSave.subscribe(() => {
+        this.$emit('saveentry', { title: this.title, content: this.content });
       });
     }
   };

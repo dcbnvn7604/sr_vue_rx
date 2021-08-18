@@ -71,4 +71,27 @@ describe('router', () => {
     await fireEvent.click(getByTestId('cancelButton'));
     await findByTestId('detailentry');
   });
+
+  it('save entry in page `edit entry`', async () => {
+    api.setToken('token1');
+    let mockFetch = jest.fn();
+    mockFetch.mockResolvedValueOnce({
+      status: 200,
+      json: () => Promise.resolve({id: 1, title: 'title 1', content: 'content 1'}),
+    });
+    mockFetch.mockResolvedValueOnce({
+      status: 200,
+      json: () => Promise.resolve({}),
+    });
+    global.fetch = mockFetch;
+
+    const { findByTestId, getByTestId } = render(App, {routes}, (vue, store, router) => {
+      router.push('/entry/1');
+    });
+    await findByTestId('detailentry');
+    await fireEvent.click(getByTestId('editButton'));
+    await findByTestId('editentry');
+    await fireEvent.click(getByTestId('saveButton'));
+    await findByTestId('detailentry');
+  });
 });

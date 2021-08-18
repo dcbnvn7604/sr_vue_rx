@@ -78,6 +78,33 @@ class API {
     );
   }
 
+  editEntry(entry) {
+    const token = of(this.token);
+    const noToken = token.pipe(
+      filter(x => !x),
+      map(x => new UnauthenticatedException())
+    );
+    const fetchEditEntry = token.pipe(
+      filter(x => !!x),
+      concatMap(x => from(fetch(`${this.host}/api/entry/${entry.id}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({title: entry.title, password: entry.content})
+      }))),
+      map(response => {
+        switch (response.status) {
+          case 200:
+            return;
+          default:
+            throw new UnsupportException();
+        }
+      })
+    );
+    return merge(noToken, fetchEditEntry);
+  }
+
   login(username, password) {
     return from(fetch(`${this.host}/api/auth/`, {
       method: 'POST',
