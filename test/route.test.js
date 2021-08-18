@@ -111,4 +111,24 @@ describe('router', () => {
     await fireEvent.click(getByTestId('addButton'));
     await findByTestId('addentry');
   });
+
+  it('click canel in page `add entry`', async () => {
+    api.setToken('token1');
+    let mockFetch = jest.fn();
+    mockFetch.mockResolvedValueOnce({
+      status: 200,
+      json: () => Promise.resolve([{id: 1, title: 'title 1'}]),
+    });
+    global.fetch = mockFetch;
+
+    const { getByTestId, findByTestId } = render(App, {routes}, (vue, store, router) => {
+      router.push('/');
+    });
+
+    await findByTestId('listentry');
+    await fireEvent.click(getByTestId('addButton'));
+    await findByTestId('addentry');
+    await fireEvent.click(getByTestId('cancelButton'));
+    await findByTestId('listentry');
+  });
 });
